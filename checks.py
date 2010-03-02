@@ -170,11 +170,14 @@ class checks:
         self.checksLogger.debug('getProcesses: start')
 
         def getCpuUsage(mo):
-            return ManagementObjectSearcher(
-                    'SELECT PercentProcessorTime FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = "%s"' %
-                    mo.GetPropertyValue('ProcessID')).Get().GetEnumerator().next().GetPropertyValue(
-                    'PercentProcessorTime')
-
+            try:
+                return ManagementObjectSearcher(
+                        'SELECT PercentProcessorTime FROM Win32_PerfFormattedData_PerfProc_Process WHERE IDProcess = "%s"' %
+                        mo.GetPropertyValue('ProcessID')).Get().GetEnumerator().next().GetPropertyValue(
+                        'PercentProcessorTime')
+            except StopIteration:
+                return 0
+                
         def getOwner(mo):
             result = Array.CreateInstance(object, 2)
             mo.InvokeMethod('GetOwner', result)
